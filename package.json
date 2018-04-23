@@ -6,10 +6,12 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "issues" : "node issues.js",
-    "repos" : "node repos.js"
+    "issues": "node issues.js",
+    "repos": "node repos.js"
   },
   "dependencies": {
-    "github-api": "^3.0.0"
+    "github-api": "^3.0.0",
+    "replace": "^0.3.0",
+    "shelljs": "^0.8.1"
   }
 }

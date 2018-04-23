@@ -1,26 +1,30 @@
-const {gh, githubUser, config} = require('./issues');
-
-/**
- * Scripting
- *
- * Génération des issues.
- *
- */
 const fs = require('fs');
 
-const allCalls = [];
+async function call(fns) {
 
-Object.keys(config).forEach(repo => {
-    fs.readdirSync(`${config[repo]}/issues`).forEach(file => {
-        const message = fs.readFileSync(`${config[repo]}/issues/${file}`, 'utf8');
+    for(let f of fns) {
+        await f();
+    }
+}
 
-        const title = file.replace('.md','');
+exports.genIssues = (gh, githubUser, config) => {
 
-        allCalls.push(gh.getIssues(githubUser, `${repo}-front`).createIssue({
-            title : title,
-            body: message
-        }));
-    })
-});
+    const allPromiseIssuesFn$ = [];
 
-Promise.all(allCalls).catch(console.log);
+    Object.keys(config).forEach(repo => {
+        fs.readdirSync(`${config[repo]}/issues`).forEach(file => {
+            const body = fs.readFileSync(`${config[repo]}/issues/${file}`, 'utf8');
+            const title = file.replace('.md','');
+
+            allPromiseIssuesFn$.push(() => {
+                console.log(`** Création issue sur le dépôt ${repo}-front : ${title} `);
+                return gh.getIssues(githubUser, `${repo}-front`).createIssue({title , body})
+            });
+        });
+
+    });
+
+
+
+    return call(allPromiseIssuesFn$);
+};
